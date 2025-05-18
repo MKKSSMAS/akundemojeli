@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Data Sekolah by NPSN</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #npsnInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .school-info {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cek data Sekolah Berdasarkan NPSN</h1>
+        
+        <div class="search-box">
+            <input type="number" 
+                   id="npsnInput" 
+                   placeholder="Masukkan NPSN sekolah..."
+                   inputmode="numeric"
+                   pattern="\d*">
+            <button onclick="cariData()">Cari</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function cariData() {
+            const npsn = document.getElementById('npsnInput').value;
+            const resultDiv = document.getElementById('result');
+            
+            // Ganti dengan URL Web App Anda
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvzPjKh0QlPSzXjpKbg8Fsz7sJCedKqc7aAwWSedZ_QARO2FzWtbDGJtpkb155-iyg/exec';
+
+            if(!npsn || npsn.length < 8) {
+                showError('Masukkan NPSN yang valid (8 digit angka)');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?npsn=${npsn}`);
+                const data = await response.json();
+                
+                if(data.status === 'found') {
+                    resultDiv.innerHTML = `
+                        <div class="school-info">
+                            <h2>${data.nama_sekolah}</h2>
+                            <p><strong>NPSN:</strong> ${data.npsn}</p>
+                            <p><strong>Akun Demo:</strong> ${data.akun}</p>
+                            <p><strong>Password :</strong> ${data.pass}</p>  
+															
+                        </div>
+                    `;
+                } else {
+                    showError('Data sekolah tidak ditemukan');
+                }
+            } catch (error) {
+                showError('Terjadi kesalahan saat mengambil data');
+            }
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="error">
+                    ${message}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
